@@ -1,0 +1,8 @@
+# Require one of the templates above; no blank issues.
+blank_issues_enabled: false
+
+# For questions and ideas, use the repo's Discussions tab.
+# For security reports, use a private Security Advisory (see SECURITY.md) — never a public issue.
+#
+# (No contact_links entry: this repo keeps external URLs out of tracked files. Add a
+# Discussions contact_link here if you fork and want one — it requires a full URL.)

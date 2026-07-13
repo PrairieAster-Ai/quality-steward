@@ -78,9 +78,12 @@ signal a shared helper is overdue. Target < 2%.
    + the payoff.
 5. **Glossary & methodology** — a condensed version of this file + reproduce commands.
 
-Markers the stamp fills: `ch:badge ch:chart ch:pie ch:files ch:loc ch:green
-ch:yellow ch:red ch:mi_mean ch:hotspots ch:top_hotspot ch:hotspot_table ch:fanout
-ch:pairs ch:cross_layer ch:cc_mean ch:cc_max ch:fn_count ch:fn_over15 ch:dup`.
+Markers the stamp fills: `ch:badge ch:chart ch:trend ch:pie ch:files ch:loc ch:green
+ch:yellow ch:red ch:doc_pct ch:security ch:mi_mean ch:hotspots ch:top_hotspot
+ch:hotspot_table ch:fanout ch:pairs ch:cross_layer ch:cc_mean ch:cc_max ch:fn_count
+ch:fn_over15 ch:dup`. `ch:trend` is a score-over-time chart (Mermaid `xychart-beta`
+line of the last ~12 `codehealth-history.tsv` readings; Unicode-sparkline fallback,
+or an "insufficient history" note with <2 readings).
 
 ## Sources
 

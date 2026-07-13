@@ -111,6 +111,55 @@ function chartMarkdown() {
   rows.push('```');
   return rows.join('\n');
 }
+// Score-over-time trend for the dashboard: a Mermaid xychart-beta line chart of
+// the last N readings (clean to emit as a fenced block), with a Unicode-sparkline
+// fallback (+ first→last delta) if the chart can't be built. Reads the freshly
+// appended codehealth-history.tsv, so run this inside the WRITE block. Robust to
+// thin history: <2 readings → an "insufficient history" note rather than a crash.
+function buildTrend(n = 12) {
+  const SPARK = '▁▂▃▄▅▆▇█';
+  let series = [];
+  try {
+    if (fs.existsSync(HISTORY)) {
+      const lines = fs.readFileSync(HISTORY, 'utf8').trim().split('\n');
+      const header = lines[0].split('\t');
+      const di = header.indexOf('date');
+      const si = header.indexOf('score');
+      series = lines.slice(1)
+        .map((l) => l.split('\t'))
+        .map((v) => ({ date: v[di], score: Number(v[si]) }))
+        .filter((p) => p.date && Number.isFinite(p.score))
+        .slice(-n);
+    }
+  } catch { /* fall through to insufficient-history */ }
+
+  if (series.length < 2) return 'insufficient history — need ≥2 readings to plot a trend';
+
+  const scores = series.map((p) => p.score);
+  const first = scores[0], last = scores[scores.length - 1];
+  const delta = r1(last - first);
+  const sign = delta > 0 ? '+' : '';
+
+  try {
+    const labels = series.map((p) => `"${String(p.date).slice(5)}"`).join(', ');
+    const values = scores.map((s) => r1(s)).join(', ');
+    return [
+      '```mermaid',
+      'xychart-beta',
+      `    title "CodeHealth score — last ${series.length} readings (${sign}${delta})"`,
+      `    x-axis [${labels}]`,
+      '    y-axis "Score" 0 --> 100',
+      `    line [${values}]`,
+      '```',
+    ].join('\n');
+  } catch {
+    // Fallback: Unicode sparkline scaled across the observed score range.
+    const min = Math.min(...scores), max = Math.max(...scores), span = max - min || 1;
+    const spark = scores.map((s) => SPARK[Math.min(SPARK.length - 1, Math.floor(((s - min) / span) * (SPARK.length - 1)))]).join('');
+    return `${spark}  ${r1(first)}→${r1(last)} (${sign}${delta})`;
+  }
+}
+
 function pieMarkdown() {
   const rows = [
     '```mermaid',
@@ -138,8 +187,9 @@ if (WRITE) {
   fs.appendFileSync(HISTORY, `${today()}\t${r1(score)}\t${grade}\t${dims.map((d) => r1(d.score)).join('\t')}\n`);
   const stampObj = {
     badge: `${grade} · ${r1(score)} / 100`,
-    chart: chartMarkdown(), pie: pieMarkdown(),
+    chart: chartMarkdown(), pie: pieMarkdown(), trend: buildTrend(),
     files: miFiles, loc: locK, green: greenFiles, yellow: yellowFiles, red: redFiles,
+    doc_pct: r1(docPct), security: r1(securityScore),
   };
   if (mi) stampObj.mi_mean = Math.round(Number(mi.mean_mi));
   if (hs) { stampObj.hotspots = Number(hs.hotspots); stampObj.top_hotspot = String(hs.top_file).split('/').pop(); }

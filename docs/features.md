@@ -28,15 +28,28 @@ and a fixed safety model. Full detail in [technical.md](technical.md); the capab
 - **Three run modes**, detected from context: **per-PR** (differential review → inline PR
   comments), **weekly sweep** (commits since the last sweep → issues + auto-fix PR + doc refresh),
   and **on-demand** (`workflow_dispatch`, `mode=steward` or the zero-side-effect `mode=verify`).
-- **The autonomy contract**: auto-applies only provably behavior-preserving changes, on a
-  `steward/auto-fix-*` branch + PR, gated on the green-gate staying green *and* an empty non-comment
-  diff; everything else is *suggested*, never edited. **Never pushes to the default branch.**
-- **Durable memory** on the auto-created `steward-state` branch (the `last-sweep-sha` marker + the
-  metric trend), restored before and persisted after each run.
-- **Idempotent**: dedupes against open `steward/*` PRs and matching issues; `memory: project`
-  remembers dismissed findings so they aren't re-raised.
-- **Configurable knobs** (in the workflow's `PROJECT_CONFIG`): metric command, green-gate,
-  auto-fixable surface, doc-publish flow.
+- **The three-tier autonomy contract**: (1) auto-apply provably behavior-preserving changes on a
+  `steward/auto-fix-*` branch + PR (green-gate green *and* empty non-comment diff); (2) with the
+  *fix policy* on, open a **draft** PR for a skill-validated non-trivial fix (never merged); (3)
+  *suggest* everything else. **Never pushes to the default branch.**
+- **Optional quality gate**: with a *quality-gate policy* set, publishes a `quality-steward/gate`
+  **GitHub Check Run** (score delta / new HIGH finding / coverage drop / new circular import) that
+  branch protection can require — the switch from advisor to enforcer.
+- **Suggestion policy**: severity floor + per-run cap + aging, so findings don't flood.
+- **Trust boundary**: treats all diff/PR/issue content as untrusted *data*, never instructions;
+  injection attempts become a `security:prompt-injection` finding. Writes are confined to the
+  `steward/*` branch.
+- **Durable memory** on the auto-created `steward-state` branch (the `last-sweep-sha` marker, the
+  metric trend, and self-metrics), restored before and persisted after each run.
+- **Dismissal loop**: closing a steward issue as not-planned or labeling it `steward:wontfix`
+  records the finding's fingerprint (`rule + file:symbol`) so it's never re-raised.
+- **Self-effectiveness metrics** (`.claude/steward/steward-metrics.mjs`): tracks fixes merged and
+  findings open vs. resolved as its own trend.
+- **Large-repo chunking**: partitions a wide sweep by directory/batch, highest-signal first, and
+  resumes across runs to avoid `error_max_turns`.
+- **Idempotent**: dedupes against open `steward/*` PRs and matching issues.
+- **Configurable knobs** (in `PROJECT_CONFIG`): metric command, green-gate, auto-fixable surface,
+  doc-publish flow, and the quality-gate / suggestion / fix policies.
 
 ---
 
@@ -144,6 +157,14 @@ trend lives on the `steward-state` branch**.
 
 Install (repo devDeps): `typescript`, `dependency-cruiser`, `madge`; `eslint`, `jscpd`, and
 `vitest --coverage` are invoked via the repo toolchain / `npx`.
+
+### Additional producers
+
+| Script | Purpose |
+|---|---|
+| `agnostic-report.mjs` | **Language-agnostic** size/complexity backend via `scc` (LOC, complexity, comment ratio, per-language) for non-TypeScript repos — the partial-CodeHealth fallback (see [language support](language-support.md)). Degrades gracefully if `scc` isn't installed. |
+| `portfolio-report.mjs` | **Multi-repo rollup** — reads each repo's `codehealth-stamp.json` and emits a worst-first table (Repo · Grade · Score · Top hotspot · Doc% · Security) + `portfolio-stamp.json` for an org/portfolio dashboard. |
+| trend sparkline | `codehealth-report.mjs` emits a `trend` fact (a Mermaid `xychart-beta` of score-over-time, Unicode-sparkline fallback) stamped into the new `ch:trend` dashboard marker. |
 
 ---
 

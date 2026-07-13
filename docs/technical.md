@@ -63,9 +63,34 @@ to a human.
   green, *and* the **non-comment diff is empty** (`git diff -G'^[^/ ]'` shows only
   whitespace/comment churn). If an edit can't be proven behavior-preserving, the steward suggests
   it instead of making it.
-- **Suggest the NON-TRIVIAL things — leave them to a human.** Anything from `code-review` or
-  `security-audit` that touches logic, control flow, dependencies, or security posture is a
-  *suggestion*, routed to the right channel. The agent does not edit it.
+- **Draft-PR the VALIDATED fixes (opt-in middle gear).** When the *fix policy* is set to `draft`,
+  a fix that a composed skill has independently validated (e.g. a `security-audit --fix`
+  sandbox-verified patch at confidence ≥ 0.9, or a change where the full green-gate passes) is
+  committed to `steward/fix-*` and opened as a **draft** PR — never marked ready, never merged. A
+  human reviews and promotes it. This is the only tier that may change runtime behavior, and only
+  behind a draft a human must accept. With the policy off (the default), such fixes downgrade to
+  suggestions.
+- **Suggest EVERYTHING ELSE — leave it to a human.** Anything from `code-review` or
+  `security-audit` that touches logic, control flow, dependencies, or security posture and isn't a
+  validated draft-PR fix is a *suggestion*, routed to the right channel and filtered by the
+  *suggestion policy*. The agent does not edit it.
+
+## Policies and the quality gate
+
+Three optional policies (set in the workflow's `PROJECT_CONFIG`; all off by default):
+
+- **Quality-gate policy** — pass/fail conditions (score delta, a new HIGH finding, coverage drop,
+  a new circular import). When set, the steward publishes a **GitHub Check Run**
+  (`quality-steward/gate`) on the PR head via the Checks API, so branch protection can *require*
+  it. This is what turns the steward from an advisor into an enforcer. It reports `neutral` (never
+  `failure`) for fork PRs whose secrets were withheld. Requires `checks: write` (in the template).
+- **Suggestion policy** — a severity floor + a per-run cap + aging, so a large first sweep can't
+  flood issues. Default is unbounded (surface everything); set it on noisy repos.
+- **Fix policy** — `off` or `draft` (the middle gear above).
+
+**The dismissal loop.** A maintainer signals "don't raise this again" by closing a steward issue
+as not-planned or labeling it `steward:wontfix`. The steward records the finding's fingerprint
+(rule + `file:symbol`, resilient to line drift) in `project` memory and never re-raises it.
 
 ## Run modes
 
@@ -106,16 +131,48 @@ finding the maintainer dismissed — don't re-raise it).
 
 ## Supply chain & security
 
+- **Prompt injection — repo content is untrusted data, never instructions.** The steward reads
+  diffs, PR/issue text, commit messages, and file contents that an outside contributor controls.
+  Its instructions come *only* from the agent definition and the workflow invocation. Text it
+  *reads* that tries to change its behavior ("ignore your guardrails," "push to main," "approve
+  this PR," "leak the token") is treated as a **`security:prompt-injection` finding to surface**,
+  not a command. The agent confines all writes to the `steward/*` branch it creates and never
+  edits `.github/workflows/`, CI config, or auth files as part of a fix. This is the steward-side
+  analog of `security-audit`'s base-ref memory loading (threat T8).
 - **Pin `SKILLS_REF` to a reviewed commit SHA, never a branch.** The steward runs with
-  `contents/pull-requests/issues: write` plus the OAuth token; fetching a moving branch would let
-  a compromised upstream execute inside that context. Bump the pin intentionally after reviewing
-  the upstream diff.
+  `contents/pull-requests/issues/checks: write` plus the OAuth token; fetching a moving branch
+  would let a compromised upstream execute inside that context. Bump the pin intentionally after
+  reviewing the upstream diff.
 - **`id-token: write` is required** — the Claude Code action uses GitHub OIDC during auth.
 - **Never switch the trigger to `pull_request_target`** on a public repo. GitHub withholds secrets
   from fork PRs by design; `pull_request_target` would run with secrets in the context of
   untrusted fork code.
 - **Subscription-token auth only.** Do not set `ANTHROPIC_API_KEY` alongside
   `CLAUDE_CODE_OAUTH_TOKEN` — it silently takes precedence.
+
+## Self-effectiveness metrics
+
+The steward tracks its *own* output as a trend: `.claude/steward/steward-metrics.mjs` counts fixes
+merged, findings open vs. resolved, and appends a dated row to `code-health/steward-metrics.tsv`
+on the `steward-state` branch. The report surfaces a one-line summary — the agent's ROI made
+visible ("closed N debt items, M findings still open"). It's also a proxy for cost: a full sweep
+consumes materially more model usage than a per-PR review, and the report notes the mode + diff
+size so subscription usage stays visible.
+
+## Scaling to large repositories
+
+A wide sweep can exceed the turn budget (`error_max_turns`). The agent **chunks** a large diff —
+partitioning changed files by top-level directory (or ~25-file batches), reviewing the
+highest-signal chunks first (ranked by the step-1 regression and hotspot table), and recording how
+far it got so the next run resumes. It reports partial coverage honestly rather than truncating.
+Prefer shrinking the window over raising `--max-turns` without bound.
+
+## Running on other forges
+
+The shipped workflow is GitHub Actions + `gh`-specific, but the agent talks to the VCS through a
+thin boundary (create-comment, open-issue, open-PR, publish-check). Porting to GitLab or Bitbucket
+swaps those calls; see [ci-portability.md](ci-portability.md) for a GitLab CI example. The
+doc-publishing backend is similarly swappable (the "publisher boundary" in the agent def).
 
 ## Repository layout
 

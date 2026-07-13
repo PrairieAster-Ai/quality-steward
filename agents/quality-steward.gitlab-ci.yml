@@ -1,0 +1,154 @@
+# quality-steward on GitLab CI — COMMUNITY-GRADE EXAMPLE
+# =============================================================================
+# This is a community port of the shipped GitHub Actions workflow
+# (agents/quality-steward.yml). It is LESS battle-tested than the GitHub
+# version — treat it as a starting point, verify it on your project, and read
+# docs/ci-portability.md for the abstraction boundary it relies on.
+#
+# It runs the quality-steward agent headless via the Claude Code CLI:
+#   - on every merge request  → differential review
+#   - on a weekly schedule    → full sweep over the week's merged commits
+#   - on demand (manual/web)  → a full pass
+#
+# The autonomy contract lives in the agent prompt (agents/quality-steward.md):
+# safe fixes go through a branch + MR (never a push to the default branch);
+# risky findings are only suggested.
+#
+# ── SETUP (one-time) ─────────────────────────────────────────────────────────
+#  1. Auth with your Claude subscription (Max/Pro):
+#       a. locally: `claude setup-token` → copy the printed one-year OAuth token
+#       b. add it as a MASKED, PROTECTED CI/CD variable named exactly
+#          CLAUDE_CODE_OAUTH_TOKEN (Settings → CI/CD → Variables)
+#       ⚠ do NOT also set ANTHROPIC_API_KEY — it takes precedence and overrides
+#         the subscription token.
+#  2. Give CI a token that can post MR notes / open issues (a Project Access
+#     Token or a Group token) as GITLAB_STEWARD_TOKEN. The default CI_JOB_TOKEN
+#     is often too narrow for the REST calls the agent makes below.
+#  3. Adjust the "stack setup" lines for your toolchain (Node/npm shown).
+#
+# SUPPLY-CHAIN: pin SKILLS_REF to a REVIEWED commit SHA, never a moving branch.
+# The steward runs with a write-capable token + the OAuth token, so fetching a
+# live branch would let a compromised upstream execute inside it. Bump it
+# intentionally after reviewing the upstream diff.
+# =============================================================================
+
+variables:
+  SKILLS_REF: "b6cf13d172739e54a14b95435415cd05dfd710cd"  # pinned reviewed quality-steward commit; bump to take updates
+  QS_REPO: "https://github.com/PrairieAster-Ai/quality-steward.git"
+  GIT_DEPTH: "0"  # full history so the weekly sweep can diff <last-sweep-sha>...HEAD
+
+# One steward per ref; a newer push supersedes an in-flight run.
+default:
+  interruptible: true
+
+.steward_base:
+  image: node:20
+  variables:
+    # Read by the Claude Code CLI for auth. Set CLAUDE_CODE_OAUTH_TOKEN as a
+    # masked/protected CI variable (see setup). The agent's Bash reads
+    # GITLAB_STEWARD_TOKEN + CI_API_V4_URL to call the GitLab REST API.
+    STEWARD_STATE_BRANCH: "steward-state"
+  before_script:
+    # --- Toolchain: adjust for your project (Node/npm shown) -----------------
+    - npm ci
+    - npm i -g @anthropic-ai/claude-code
+    # --- Install the composed skills + agent definition from canonical -------
+    # The CLI loads PROJECT skills (./.claude/skills/<name>/SKILL.md) and the
+    # agent def (./.claude/agents/<name>.md). Both are pulled from the canonical
+    # quality-steward repo at runtime, pinned to SKILLS_REF, so this repo commits
+    # NOTHING but this file — the canonical version stays the source of truth.
+    - git clone --filter=blob:none "$QS_REPO" /tmp/qs
+    - git -C /tmp/qs checkout --quiet "$SKILLS_REF"
+    - mkdir -p .claude/skills .claude/agents
+    - |
+      for s in code-health code-quality code-readability security-audit github wiki-publish; do
+        cp -r "/tmp/qs/skills/$s" .claude/skills/
+      done
+    - cp /tmp/qs/agents/quality-steward.md .claude/agents/quality-steward.md
+
+# -----------------------------------------------------------------------------
+# PER-MR mode: differential review of the merge request diff.
+# GitLab exposes the MR via CI_MERGE_REQUEST_IID and the source/target branches.
+# NOTE: the agent's suggestion channel is GitLab MR notes, NOT `gh`. It posts via
+#   POST $CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes
+# (or /discussions for inline). See docs/ci-portability.md.
+# -----------------------------------------------------------------------------
+steward:mr:
+  extends: .steward_base
+  stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - |
+      claude -p "Project config — metric command: \`npm run codehealth:report\`; \
+      green-gate: \`npm run lint && npm run type-check\`; \
+      auto-fixable surface: \`/code-readability annotate\`, lint --fix, formatter; \
+      doc-publish flow: your stamp/publish scripts. \
+      Run as the quality-steward in PER-PR mode. Review the diff of merge request \
+      !${CI_MERGE_REQUEST_IID} (origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}...HEAD). \
+      Post MR notes for risky findings via the GitLab REST API \
+      (\$CI_API_V4_URL/projects/\$CI_PROJECT_ID/merge_requests/\$CI_MERGE_REQUEST_IID/notes); \
+      open an auto-fix branch + MR ONLY for safe, behavior-preserving mechanical fixes. \
+      Never push to the default branch." \
+      --agent quality-steward \
+      --permission-mode acceptEdits \
+      --max-turns 80 \
+      --allowedTools Bash,Read,Write,Edit,Grep,Glob,Skill
+
+# -----------------------------------------------------------------------------
+# WEEKLY SWEEP mode: review the commits merged since the last sweep.
+# Configure a weekly pipeline schedule (CI/CD → Schedules) that sets
+# STEWARD_MODE=sweep. The last-sweep SHA lives on a dedicated steward-state
+# branch (see the resolve/persist steps) — CI runners are ephemeral, so that
+# branch, not agent memory, is the source of truth. Suggestions become GitLab
+# ISSUES via POST $CI_API_V4_URL/projects/$CI_PROJECT_ID/issues.
+# -----------------------------------------------------------------------------
+steward:sweep:
+  extends: .steward_base
+  stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $STEWARD_MODE == "sweep"'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $STEWARD_MODE == "sweep"'
+      when: manual
+  script:
+    # Resolve the sweep range from the steward-state branch (fallback HEAD~20).
+    - |
+      RANGE="HEAD~20...HEAD"
+      if git fetch --depth 1 origin "$STEWARD_STATE_BRANCH" 2>/dev/null; then
+        LAST="$(git show FETCH_HEAD:last-sweep-sha 2>/dev/null | tr -d '[:space:]')"
+        if [ -n "$LAST" ] && git cat-file -e "${LAST}^{commit}" 2>/dev/null; then
+          RANGE="${LAST}...HEAD"
+        fi
+      fi
+      echo "Sweep range: $RANGE"
+      export SWEEP_RANGE="$RANGE"
+    - |
+      claude -p "Project config — metric command: \`npm run codehealth:report\`; \
+      green-gate: \`npm run lint && npm run type-check\`; \
+      auto-fixable surface: \`/code-readability annotate\`, lint --fix, formatter; \
+      doc-publish flow: your stamp/publish scripts. \
+      Run as the quality-steward in WEEKLY SWEEP mode. Review git diff ${SWEEP_RANGE} \
+      (the commits merged since the last sweep). Open GitLab issues for risky findings via \
+      \$CI_API_V4_URL/projects/\$CI_PROJECT_ID/issues, an auto-fix branch + MR for safe \
+      mechanical fixes, and refresh the project docs via the configured doc-publish flow \
+      (publish only if the code surface changed)." \
+      --agent quality-steward \
+      --permission-mode acceptEdits \
+      --max-turns 80 \
+      --allowedTools Bash,Read,Write,Edit,Grep,Glob,Skill
+    # Persist the new marker only after a successful sweep. Uses HEAD SHA of the
+    # commit the pipeline ran against (CI_COMMIT_SHA) — NOT `git rev-parse HEAD`,
+    # which would reflect whatever branch the agent left the tree on.
+    - |
+      D="$(mktemp -d)"
+      REMOTE="https://oauth2:${GITLAB_STEWARD_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+      if ! git clone --depth 1 --branch "$STEWARD_STATE_BRANCH" "$REMOTE" "$D" 2>/dev/null; then
+        git clone --depth 1 "$REMOTE" "$D"
+        git -C "$D" checkout --orphan "$STEWARD_STATE_BRANCH"
+        git -C "$D" rm -rf . >/dev/null 2>&1 || true
+      fi
+      echo "$CI_COMMIT_SHA" > "$D/last-sweep-sha"
+      git -C "$D" add last-sweep-sha
+      git -C "$D" -c user.name='quality-steward' -c user.email='steward@ci.local' \
+        commit -m "chore(steward): last-sweep marker ${CI_COMMIT_SHA}" || { echo "marker unchanged"; exit 0; }
+      git -C "$D" push origin "$STEWARD_STATE_BRANCH"

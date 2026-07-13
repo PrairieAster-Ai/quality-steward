@@ -125,8 +125,17 @@ dashboard and onboarding docs it keeps current.
 - **[The steward on a real project](docs/example-nearest-nice-weather.md)** — the live example,
   with real numbers.
 - **[Technical documentation](docs/technical.md)** — architecture, the composed skills, the
-  autonomy contract, run modes, and security.
+  autonomy contract, policies + the quality gate, run modes, and security.
+- **[How it compares](docs/comparison.md)** — honest positioning against code-health incumbents,
+  the AI PR-review wave, and security/dependency bots.
+- **[Language support](docs/language-support.md)** — what a non-TypeScript repo does and doesn't
+  get today (the metric + doc skills are TS/JS-first; review + security are multi-language).
+- **[CI portability](docs/ci-portability.md)** — running on forges other than GitHub Actions.
 - **[Blog: Good software metrics, and how to actually keep them](blog/using-ai-to-track-software-metrics.md)**
+
+> **Scope note:** the CodeHealth score and doc generation are **TypeScript/React-first** today;
+> code review and security auditing are multi-language, and a language-agnostic metrics fallback
+> covers size/complexity on other stacks. See [language support](docs/language-support.md).
 
 ## License
 

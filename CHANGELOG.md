@@ -3,16 +3,40 @@
 All notable changes to this repo are documented here. Format follows
 Keep a Changelog; versioning is Semantic Versioning.
 
-## [Unreleased]
+## [0.2.0] — 2026-07-13
+
+A capability + hardening release addressing a competitive-landscape review. Adds enforcement, a
+safer autonomy model, honesty about scope, and OSS hygiene.
 
 ### Added
 
-- **`docs/features.md`** — a complete feature reference: every mode, command, flag, metric, gate,
-  and output across the agent and all six composed skills (code-health, code-review, security-audit,
-  code-quality, code-readability, github, wiki-publish).
-- **`docs/usage.md`** — step-by-step playbooks for the three use cases (onboard an existing
-  codebase; wire into CI/CD; long-term maintenance).
-- Cross-links from the README, `metrics.md`, and `technical.md` into the new references.
+- **Optional quality gate** — a `quality-gate policy` publishes a `quality-steward/gate` GitHub
+  Check Run (score delta / new HIGH finding / coverage drop / new circular import) that branch
+  protection can require. Turns the steward from advisor into enforcer. (`checks: write` added.)
+- **Suggestion policy** — severity floor + per-run cap + aging so findings don't flood.
+- **Draft-PR middle gear** — with `fix policy: draft`, skill-validated non-trivial fixes open a
+  *draft* PR (never merged) instead of only an issue.
+- **Prompt-injection guardrail** — repo/PR/issue content is treated as untrusted data, never
+  instructions; injection attempts surface as a `security:prompt-injection` finding, writes are
+  confined to the `steward/*` branch.
+- **Concrete dismissal loop** — `steward:wontfix` / close-as-not-planned records a finding
+  fingerprint (`rule + file:symbol`) so it's never re-raised.
+- **Self-effectiveness metrics** — `scripts/steward-metrics.mjs` trends fixes-merged and
+  findings open vs. resolved (vendored to `.claude/steward/` at runtime; persisted on
+  `steward-state`).
+- **Language-agnostic backend** — `code-health/scripts/agnostic-report.mjs` (`scc`) gives non-TS
+  repos a partial CodeHealth; plus `docs/language-support.md` stating scope honestly.
+- **Portfolio rollup** — `code-health/scripts/portfolio-report.mjs` aggregates CodeHealth across
+  repos.
+- **Trend sparkline** — the dashboard gains a `ch:trend` score-over-time chart.
+- **Large-repo chunking** — the sweep partitions wide diffs to avoid `error_max_turns`; the
+  workflow now restores + persists the durable trend on `steward-state`.
+- **CI portability** — `docs/ci-portability.md` + a GitLab CI example
+  (`agents/quality-steward.gitlab-ci.yml`).
+- **Cost transparency** — the report notes model usage / diff size.
+- **Docs** — `docs/features.md` (complete feature reference), `docs/usage.md` (the three use-case
+  playbooks), `docs/comparison.md` (competitive positioning).
+- **OSS hygiene** — `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue/PR templates.
 
 ## [0.1.0] — 2026-07-13
 

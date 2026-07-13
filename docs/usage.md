@@ -90,9 +90,16 @@ green for an auto-fix to be allowed:
 green-gate: `npm run lint && npm run type-check && npm test`
 ```
 
-**3. Turn metrics into gates.** A metric that's measured but never enforced is a silent gap. Add
-the gate-able checks as CI steps that *fail the build*, and set thresholds in
-`code-health.config.json`:
+**3a. Let the steward publish the gate (the easy path).** Set a **quality-gate policy** in
+`PROJECT_CONFIG` — e.g. *fail if the CodeHealth score drops more than 3, a new HIGH security
+finding appears, or a new circular import is introduced.* The steward evaluates it each PR and
+publishes a `quality-steward/gate` **Check Run**; add that check to branch protection and a PR
+can't merge below the bar. This is the one-line way to turn the steward from advisor into
+enforcer (see [technical.md](technical.md#policies-and-the-quality-gate)).
+
+**3b. Add hard CI gates for the deterministic checks (belt and suspenders).** A metric that's
+measured but never enforced is a silent gap. Wire the gate-able checks as CI steps that *fail the
+build*, and set thresholds in `code-health.config.json`:
 
 ```bash
 node skills/code-health/scripts/check-circular-deps.mjs     # exit non-zero if any cycle exists

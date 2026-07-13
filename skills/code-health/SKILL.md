@@ -108,6 +108,13 @@ headline grade → metrics by **business outcome** (risk / throughput / onboardi
 → detailed views (MI pie, hotspots, coupling) → glossary. Every view ends with
 **Improve & ROI**. Mirror the layout in `references/methodology.md`.
 
+Stamp facts include a **`ch:trend`** score-over-time chart (a Mermaid
+`xychart-beta` line of the last ~12 `codehealth-history.tsv` readings, with a
+Unicode-sparkline fallback and an "insufficient history" note when there are <2
+readings) plus `ch:doc_pct` / `ch:security` for the CodeHealth roll-up's
+documentation and dependency-security dimensions. The full marker set lives in
+`references/methodology.md`.
+
 ## Quality-coverage checklist (steward feature)
 
 `quality-checklist.mjs` is a steward-level tracker that ships here (it reuses this
