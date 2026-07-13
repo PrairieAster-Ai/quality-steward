@@ -21,8 +21,8 @@ tedious, easy to skip, and the first thing to go when a deadline looms.
 Which is exactly the kind of work that changed cost the moment capable AI agents arrived. This
 post is about what a *good* metric looks like, and then about handing the upkeep to an agent —
 using a small, real project as the running example: [nearestniceweather](https://github.com/PrairieAster-Ai/nearest-nice-weather),
-a Minnesota weather app with a single maintainer and a few visitors a month. If a metrics
-practice is worth anything, it should be worth it there too.
+a Minnesota weather app maintained by one person. If a metrics practice is worth anything, it
+should be worth it even at a team of one.
 
 ## What makes a metric worth tracking
 
@@ -131,13 +131,11 @@ onboarding), inline PR comments where the change is being reviewed, and durable 
 things that need a human. The medium is chosen so the message lands where the decision is made.
 
 Code health is only half of it, though. nearestniceweather also instruments its own *runtime* —
-and this is where "traffic doesn't matter" lands hardest. Despite a trickle of visitors, the app
-emits its core product action, self-reported API-reliability and slow-request events, deploy-drift
-telemetry that catches users stuck on a stale bundle, plus real Core Web Vitals and unhandled
-exceptions. A one-visitor app that measures its own deploy freshness and error rate has a more
-serious metrics practice than a high-traffic app that measures none of it. The maturity is in the
-instrumentation, not the numbers — and an agent watching both the structural trend and the
-runtime signals can tell you when *either* moves.
+self-reported API-reliability and slow-request events, deploy-drift telemetry that catches users
+stuck on a stale bundle, plus real Core Web Vitals and unhandled exceptions — so operational
+problems surface as signals rather than support tickets. A codebase graded for structural health
+*and* wired to report its own reliability is one you can operate with confidence, and an agent
+watching both the structural trend and the runtime signals can tell you when *either* moves.
 
 ## What the AI is, and isn't, doing
 

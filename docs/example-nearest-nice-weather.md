@@ -3,9 +3,9 @@
 This is the quality-steward running unattended on a live repository —
 [**PrairieAster-Ai/nearest-nice-weather**](https://github.com/PrairieAster-Ai/nearest-nice-weather),
 a Minnesota outdoor-recreation weather app. Every number and PR reference below is real, pulled
-from the repo on **2026-07-13**. It's a deliberately modest project — a single maintainer, a few
-visitors a month — which is the point: **a mature metrics practice is about the discipline, not
-the traffic.**
+from the repo on **2026-07-13**. It's a deliberately modest, single-maintainer project — which is
+the point: **a mature quality practice is about the discipline, and it scales down to a team of
+one.**
 
 ## The project
 
@@ -64,7 +64,7 @@ ranking misses.
 
 The steward was installed in **PR #311** (merged 2026-06-29) and has run on every PR and every
 Monday sweep since — the latest scheduled full sweep completed **2026-07-13**. What it has
-actually done splits cleanly along the [autonomy contract](../README.md#the-autonomy-contract):
+actually done splits cleanly along the [autonomy contract](technical.md#the-autonomy-contract):
 
 **Safe, mechanical work → auto-fix PRs it opened and a human merged:**
 
@@ -93,21 +93,19 @@ when it drifts (**#331**, since fixed): the steward is subject to the same revie
 `last-sweep-sha` marker), so each weekly sweep resumes exactly where the last ended — without the
 agent ever pushing to the default branch.
 
-## Beyond code health: the app measures itself, too
+## Beyond code health: the app measures its own reliability
 
-Structural metrics are only half of a metrics culture. nearestniceweather also instruments its
-own **runtime** behavior via product analytics — and this is where the "traffic doesn't matter"
-point lands hardest. Despite only a handful of visitors a month, the app emits:
+Structural metrics are only half of a quality culture. nearestniceweather also instruments its
+own **runtime** behavior, so problems surface as signals rather than support tickets:
 
-- `purchase_list_generated` — the core product action (a real conversion event to trend).
 - `api_request_failed` / `api_request_slow` — self-reported **reliability** telemetry.
 - `deploy_version_drift_detected` / `stale_bundle_recovered` — deploy-freshness telemetry that
   catches users stuck on a stale bundle.
 - `$web_vitals` and `$exception` — real Core Web Vitals and unhandled errors.
 
-A one-visitor app that measures its own deploy drift, API reliability, and web vitals has a more
-mature metrics practice than a high-traffic app that measures none of it. **The maturity is in
-the instrumentation, not the numbers.**
+A codebase graded for structural health *and* wired to report its own reliability, deploy
+freshness, and errors is one you can operate with confidence. **The maturity is in the
+instrumentation — the same discipline the steward keeps applied to the code.**
 
 ## The takeaway
 
