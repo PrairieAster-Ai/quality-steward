@@ -65,16 +65,18 @@ toolchain / `npx`.
   producers then the roll-up). Add `--no-write` to print without appending history.
 - **`refresh`** — regenerate the dashboard: `run-all.mjs --stamp <wiki>/Code-Health-Dashboard.md <wiki>/Home.md` fills the `<!--ch:*-->` markers.
 
-Suggested `package.json` aliases (point at the global skill dir):
+Suggested `package.json` aliases. Point them at wherever the skill is installed —
+`.claude/skills/code-health/scripts/…` when it's vendored into the project (the quality-steward
+model, shown below), or `~/.claude/skills/code-health/scripts/…` for a global install:
 
 ```jsonc
-"mi:report":             "node ~/.claude/skills/code-health/scripts/maintainability-report.mjs",
-"complexity:report":     "node ~/.claude/skills/code-health/scripts/complexity-report.mjs",
-"hotspot:report":        "node ~/.claude/skills/code-health/scripts/hotspot-report.mjs",
-"coupling:report":       "node ~/.claude/skills/code-health/scripts/coupling-report.mjs",
-"change-coupling:report":"node ~/.claude/skills/code-health/scripts/change-coupling-report.mjs",
-"duplication:report":    "node ~/.claude/skills/code-health/scripts/duplication-report.mjs",
-"codehealth:report":     "node ~/.claude/skills/code-health/scripts/run-all.mjs"
+"mi:report":             "node .claude/skills/code-health/scripts/maintainability-report.mjs",
+"complexity:report":     "node .claude/skills/code-health/scripts/complexity-report.mjs",
+"hotspot:report":        "node .claude/skills/code-health/scripts/hotspot-report.mjs",
+"coupling:report":       "node .claude/skills/code-health/scripts/coupling-report.mjs",
+"change-coupling:report":"node .claude/skills/code-health/scripts/change-coupling-report.mjs",
+"duplication:report":    "node .claude/skills/code-health/scripts/duplication-report.mjs",
+"codehealth:report":     "node .claude/skills/code-health/scripts/run-all.mjs"
 ```
 
 ## The CodeHealth roll-up
@@ -156,8 +158,10 @@ to the default branch instead leaves a snapshot that silently goes stale.
 - `scripts/config.mjs` — shared config loader + helpers
 - `scripts/{maintainability,complexity,hotspot,coupling,change-coupling,duplication,security,coverage}-report.mjs` — producers
 - `scripts/{check-circular-deps,check-doc-coverage}.mjs` — gate-able checks
-- `scripts/codehealth-report.mjs` — the roll-up + stamp facts
+- `scripts/codehealth-report.mjs` — the roll-up + stamp facts (incl. the `trend` sparkline)
 - `scripts/stamp-codehealth.mjs` — fill dashboard markers
 - `scripts/run-all.mjs` — produce everything in order (+ optional `--stamp`)
+- `scripts/agnostic-report.mjs` — language-agnostic size/complexity backend (via `scc`) for non-TS repos
+- `scripts/portfolio-report.mjs` — multi-repo CodeHealth rollup → portfolio dashboard
 - `scripts/quality-checklist.mjs` — capability-coverage checklist → Quality-Coverage dashboard
 - `references/methodology.md` — formulas, anchors, glossary, dashboard template

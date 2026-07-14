@@ -26,14 +26,14 @@ The two skills coexist (different slugs, different commands). Run either or both
 ### Per project
 
 ```bash
-git clone https://github.com/PrairieAster-Ai/claude-code-skills.git /tmp/ccs
-cp -r /tmp/ccs/skills/security-audit .claude/skills/
+git clone https://github.com/PrairieAster-Ai/quality-steward.git /tmp/qs
+cp -r /tmp/qs/skills/security-audit .claude/skills/
 ```
 
 ### Global
 
 ```bash
-git clone https://github.com/PrairieAster-Ai/claude-code-skills.git ~/.claude/skills-collection
+git clone https://github.com/PrairieAster-Ai/quality-steward.git ~/.claude/skills-collection
 ln -s ~/.claude/skills-collection/skills/security-audit ~/.claude/skills/security-audit
 ```
 
@@ -154,7 +154,7 @@ In `--post-pr` mode, the same finding is rendered as a numbered list item with a
 
 The skill draws on:
 
-- **OWASP Top 10:2025** and **OWASP ASVS 5.0.** The [`owasp-security`](https://github.com/PrairieAster-Ai/claude-code-skills) skill is a complementary deep-reference companion.
+- **OWASP Top 10:2025** and **OWASP ASVS 5.0.** A companion `owasp-security` deep-reference skill exists separately (not bundled here).
 - **MITRE ATT&CK** for technique tagging
 - **CWE Top 25** for category mapping
 - **Anthropic's published `claude-code-security-review`** prompt and findings filter (baseline)

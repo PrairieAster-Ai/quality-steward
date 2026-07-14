@@ -235,7 +235,7 @@ The routing key is the finding's primary classification, derived in this order:
 | A09 Logging & Monitoring Failures | V9 | `verifiers/logging.md` |
 | A10 SSRF | V10 (SSRF sub-section of V5) | `verifiers/ssrf.md` |
 
-Specialized verifiers live in `references/verifiers/` (not all created yet — generic fallback handles unimplemented categories). Each specialist prompt encodes:
+The table above is the *intended* routing; the `references/verifiers/` prompt files **do not ship yet**, so today the generic verifier handles every category (the OWASP/CWE/ASVS routing still selects the right checklist context). When present, each specialist prompt encodes:
 
 - The exploitation model for the vulnerability class (e.g., SSRF requires host or protocol control, not just path)
 - Common false-positive patterns for the class (e.g., React XSS is auto-escaped except in `dangerouslySetInnerHTML`)
