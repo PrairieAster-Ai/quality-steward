@@ -3,6 +3,12 @@
 All notable changes to this repo are documented here. Format follows
 Keep a Changelog; versioning is Semantic Versioning.
 
+## [0.2.3] — 2026-07-13
+
+### Fixed
+
+- Clarify the trend-chart title delta as `(Δ …)` instead of a bare `(0)`.
+
 ## [0.2.2] — 2026-07-13
 
 ### Fixed

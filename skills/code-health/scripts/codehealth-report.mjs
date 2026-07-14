@@ -146,7 +146,7 @@ function buildTrend(n = 12) {
     return [
       '```mermaid',
       'xychart-beta',
-      `    title "CodeHealth score — last ${series.length} readings (${sign}${delta})"`,
+      `    title "CodeHealth score — last ${series.length} readings (Δ ${sign}${delta})"`,
       `    x-axis [${labels}]`,
       '    y-axis "Score" 0 --> 100',
       `    line [${values}]`,
@@ -156,7 +156,7 @@ function buildTrend(n = 12) {
     // Fallback: Unicode sparkline scaled across the observed score range.
     const min = Math.min(...scores), max = Math.max(...scores), span = max - min || 1;
     const spark = scores.map((s) => SPARK[Math.min(SPARK.length - 1, Math.floor(((s - min) / span) * (SPARK.length - 1)))]).join('');
-    return `${spark}  ${r1(first)}→${r1(last)} (${sign}${delta})`;
+    return `${spark}  ${r1(first)}→${r1(last)} (Δ ${sign}${delta})`;
   }
 }
 
