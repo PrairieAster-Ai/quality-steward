@@ -26,20 +26,32 @@ All guides and reference material are in the **[project Wiki](https://github.com
 
 ## Quickstart
 
-The workflow is the only file you commit; it pulls the agent + skills from this repo at a pinned
-commit. Copy it, add your Claude subscription token, and verify:
+quality-steward *is* a Claude Code agent, so you install it by handing Claude Code a prompt — not
+by running commands yourself. Open Claude Code in your repo and paste this:
 
-```bash
-mkdir -p .github/workflows
-curl -fsSL https://raw.githubusercontent.com/PrairieAster-Ai/quality-steward/main/agents/quality-steward.yml \
-  -o .github/workflows/quality-steward.yml
-claude setup-token   # add the printed token as the Actions secret CLAUDE_CODE_OAUTH_TOKEN
-gh workflow run quality-steward.yml -f mode=verify
+```text
+Install the quality-steward agent into this repository.
+
+1. Download the workflow template from
+   https://raw.githubusercontent.com/PrairieAster-Ai/quality-steward/main/agents/quality-steward.yml
+   into .github/workflows/quality-steward.yml.
+2. Read the quality-steward wiki (https://github.com/PrairieAster-Ai/quality-steward/wiki),
+   inspect THIS repo, and adapt the template: swap the Node/npm stack-setup steps for my toolchain,
+   fill PROJECT_CONFIG (metric command, green-gate, auto-fixable surface, doc-publish flow), and
+   pin SKILLS_REF to the latest quality-steward release tag.
+3. Walk me through authenticating CI: tell me to run `claude setup-token`, then set the token I
+   paste back as the CLAUDE_CODE_OAUTH_TOKEN Actions secret (and warn me off ANTHROPIC_API_KEY,
+   which silently overrides it).
+4. Run the workflow in verify mode and confirm auth is wired correctly.
+
+Show me the diff before committing anything.
 ```
 
-Full setup, configuration, and the three adoption playbooks are in the
+The workflow is the only file you commit; it pulls the agent + skills from this repo at the pinned
+`SKILLS_REF`. Full setup, the quality gate, and the three adoption playbooks are in the
 [Installation](https://github.com/PrairieAster-Ai/quality-steward/wiki/Installation) and
-[Usage](https://github.com/PrairieAster-Ai/quality-steward/wiki/Usage) wiki pages.
+[Usage](https://github.com/PrairieAster-Ai/quality-steward/wiki/Usage) wiki pages — all as
+copy-paste prompts.
 
 ## What's in this repo
 
