@@ -26,14 +26,14 @@ The two skills coexist (different slugs, different commands). Run either or both
 ### Per project
 
 ```bash
-git clone https://github.com/PrairieAster-Ai/quality-steward.git /tmp/qs
+git clone https://github.com/PrairieAster-Ai/quality-butler.git /tmp/qs
 cp -r /tmp/qs/skills/security-audit .claude/skills/
 ```
 
 ### Global
 
 ```bash
-git clone https://github.com/PrairieAster-Ai/quality-steward.git ~/.claude/skills-collection
+git clone https://github.com/PrairieAster-Ai/quality-butler.git ~/.claude/skills-collection
 ln -s ~/.claude/skills-collection/skills/security-audit ~/.claude/skills/security-audit
 ```
 

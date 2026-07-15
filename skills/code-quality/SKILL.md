@@ -8,7 +8,7 @@ allowed-tools: "Bash(npm:*),Bash(npx:*),Read,Write,Edit,Grep,Glob"
 
 Systematic code quality analysis, metric tracking, and improvement sprint planning for TypeScript/React projects.
 
-> **How this relates to `code-health`.** In the quality-steward bundle, `code-health` owns the
+> **How this relates to `code-health`.** In the quality-butler bundle, `code-health` owns the
 > structural roll-up (Maintainability Index, coupling, hotspots) and the graded dashboard, and
 > already folds in coverage and lint signals. `code-quality` is the **hands-on improvement** side:
 > lint/type-check/coverage runs plus **sprint planning** to act on the findings. Some measures

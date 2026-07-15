@@ -21,7 +21,7 @@ Producers generate pages + a facts JSON; this skill stamps and publishes them.
 | **What** to measure — the CodeHealth roll-up + dashboard facts | **code-health** |
 | **How** it's stamped + pushed to the wiki (markers, SSH clone/commit/push, guard) | **wiki-publish** (this) |
 
-The `quality-steward` agent composes all three in its "document" step: producers
+The `quality-butler` agent composes all three in its "document" step: producers
 write pages + facts, then `wiki-publish` stamps and pushes them.
 
 ## The marker convention
@@ -47,7 +47,7 @@ A new producer just picks a prefix and emits a facts JSON; `stamp.mjs` is generi
     (i.e. it's hand-authored — never clobber it)
   - `push <wiki-dir> "<msg>"` → add/commit/push (no-op if clean; clear SSH-auth error)
 
-## Publish protocol (what the steward / producers follow)
+## Publish protocol (what the butler / producers follow)
 
 1. `wiki-repo.mjs url` → `clone` the wiki to a scratch dir.
 2. Producers write/refresh their pages into it and emit a facts JSON.

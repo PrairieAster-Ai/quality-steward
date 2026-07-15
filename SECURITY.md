@@ -1,6 +1,6 @@
 # Security policy
 
-The steward is an agent that runs in CI with write scopes and reads untrusted content, so its
+The butler is an agent that runs in CI with write scopes and reads untrusted content, so its
 security posture is part of the product. This document covers how to report a vulnerability, what
 is in scope, the supply-chain model, and the agent's own threat model.
 
@@ -27,8 +27,8 @@ before disclosing it publicly.
 
 In scope:
 
-- the agent definition (`agents/quality-steward.md`) and the shipped workflow
-  (`agents/quality-steward.yml`),
+- the agent definition (`agents/quality-butler.md`) and the shipped workflow
+  (`agents/quality-butler.yml`),
 - the bundled skills under `skills/` — their scripts and the deterministic CLIs,
 - the supply-chain and CI posture described below.
 
@@ -38,13 +38,13 @@ Out of scope:
   dependency-cruiser, and the rest) — report those to their own projects; we'll adjust our usage if
   needed,
 - issues that require a consumer to have already misconfigured their own repo against the guidance
-  in [Installation](https://github.com/PrairieAster-Ai/quality-steward/wiki/Installation) and [Technical](https://github.com/PrairieAster-Ai/quality-steward/wiki/Technical) (for example, adding an
+  in [Installation](https://github.com/PrairieAster-Ai/quality-butler/wiki/Installation) and [Technical](https://github.com/PrairieAster-Ai/quality-butler/wiki/Technical) (for example, adding an
   `ANTHROPIC_API_KEY` secret, or switching the trigger to `pull_request_target`).
 
 ## Supply-chain posture
 
-The steward runs with write scopes and a subscription token, so the trust boundary is enforced
-deliberately. See [Technical](https://github.com/PrairieAster-Ai/quality-steward/wiki/Technical#supply-chain--security) for the full
+The butler runs with write scopes and a subscription token, so the trust boundary is enforced
+deliberately. See [Technical](https://github.com/PrairieAster-Ai/quality-butler/wiki/Technical#supply-chain--security) for the full
 rationale.
 
 - **`SKILLS_REF` is pinned to a reviewed commit SHA, never a moving branch.** Consuming repos pull
@@ -59,17 +59,17 @@ rationale.
   design. `pull_request_target` would run untrusted fork code with secrets in context; the shipped
   workflow uses `pull_request` and keeps it that way.
 - **State lives off the default branch.** The durable sweep marker and metric trend live on a
-  dedicated `steward-state` branch; the agent never pushes to the default branch.
+  dedicated `butler-state` branch; the agent never pushes to the default branch.
 
 ## The agent's own threat model
 
-The steward reads content it does not control — pull-request diffs, issue and PR text, source files
+The butler reads content it does not control — pull-request diffs, issue and PR text, source files
 from forks. It treats all of that as **data, not instructions**: repository and PR content is
 material to review, never a source of commands that can change what the agent does. Two structural
 defenses back this up:
 
 - **Writes are restricted to the auto-fix branch.** Anything the agent changes goes onto a
-  `steward/auto-fix-*` branch through a pull request, gated on the green-gate staying green *and* an
+  `butler/auto-fix-*` branch through a pull request, gated on the green-gate staying green *and* an
   empty non-comment diff. It never pushes to the default branch. So even a successful prompt-
   injection attempt is bounded by the autonomy contract — it cannot merge, cannot touch protected
   branches, and cannot silently edit logic.
@@ -77,4 +77,4 @@ defenses back this up:
   ref, not the head, so a malicious PR cannot ship a memory that suppresses its own finding.
 
 The full autonomy contract and boundary are documented in
-[Technical](https://github.com/PrairieAster-Ai/quality-steward/wiki/Technical#the-autonomy-contract).
+[Technical](https://github.com/PrairieAster-Ai/quality-butler/wiki/Technical#the-autonomy-contract).

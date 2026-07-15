@@ -119,7 +119,7 @@ Assemble into pages under `/tmp/cr-docs/` and show the user the index + one samp
 
 ## Phase 4 — Publish to the GitHub Wiki
 
-Reuse the repo's `/github wiki` flow (SSH push to `<repo>.wiki.git`, single `master` branch, no PRs). Do **not** invent new auth.
+Reuse the repo's `/github-wiki wiki` flow (SSH push to `<repo>.wiki.git`, single `master` branch, no PRs). Do **not** invent new auth.
 
 1. Resolve the wiki SSH URL: take the repo origin, swap `.git` → `.wiki.git`, ensure `git@github.com:` form. Verify `ssh -T git@github.com`.
 2. Clone (or `git pull` an existing clone) into a temp dir.

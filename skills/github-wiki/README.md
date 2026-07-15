@@ -14,11 +14,11 @@ The skill knows these pitfalls and guides you through them instead of letting yo
 ## Quick Start
 
 ```
-/github wiki list            — Clone the wiki and list all pages
-/github wiki edit <page>     — Edit a specific wiki page
-/github wiki create <page>   — Create a new wiki page
-/github projects list        — List GitHub Projects for this repo
-/github projects view <num>  — View a specific project board
+/github-wiki wiki list            — Clone the wiki and list all pages
+/github-wiki wiki edit <page>     — Edit a specific wiki page
+/github-wiki wiki create <page>   — Create a new wiki page
+/github-wiki projects list        — List GitHub Projects for this repo
+/github-wiki projects view <num>  — View a specific project board
 ```
 
 ## Prerequisites

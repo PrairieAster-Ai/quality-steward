@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 //
-// Quality-coverage checklist — the steward's "what quality capability is available,
+// Quality-coverage checklist — the butler's "what quality capability is available,
 // and is it actually turned on here?" tracker. Probes the repo (CI workflows, ESLint
 // config, package.json scripts, pre-commit, code-health history, installed skills,
 // and — with --wiki — published wiki pages) for every capability the quality skills
@@ -79,9 +79,9 @@ const CAPS = [
   ['📚 Documentation', 'Team pages (onboarding)', wikiStatus('Getting-Started'), 'Getting-Started + Skill-Inventory'],
   ['📚 Documentation', 'DB schema page', usesDrizzle ? (wikiStatus('Reference-Database-Schema')) : NA, usesDrizzle ? 'gen-schema-page' : 'N/A — no Drizzle ORM'],
 
-  ['🤖 Steward automation', 'Weekly sweep', /quality-steward[\s\S]*cron:/.test(ci) ? DONE : GAP, 'scheduled CodeHealth + review'],
-  ['🤖 Steward automation', 'Per-PR review', /quality-steward[\s\S]*pull_request/.test(ci) ? DONE : GAP, 'differential review on PRs'],
-  ['🤖 Steward automation', 'Shared wiki-publish substrate', exists('.claude/skills/wiki-publish') ? DONE : GAP, 'stamp + push'],
+  ['🤖 Butler automation', 'Weekly sweep', /quality-butler[\s\S]*cron:/.test(ci) ? DONE : GAP, 'scheduled CodeHealth + review'],
+  ['🤖 Butler automation', 'Per-PR review', /quality-butler[\s\S]*pull_request/.test(ci) ? DONE : GAP, 'differential review on PRs'],
+  ['🤖 Butler automation', 'Shared wiki-publish substrate', exists('.claude/skills/wiki-publish') ? DONE : GAP, 'stamp + push'],
 ];
 
 // ── Render ──

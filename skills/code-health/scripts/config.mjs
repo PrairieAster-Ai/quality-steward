@@ -52,7 +52,7 @@ function deriveBlob() {
   if (cfg.blobBase) return cfg.blobBase;
   try {
     const url = execSync('git remote get-url origin', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    const m = url.match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/);
+    const m = url.match(/github-wiki\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/);
     if (m) {
       let branch = 'main';
       try { branch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || 'main'; } catch { /* default main */ }

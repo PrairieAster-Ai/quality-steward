@@ -1,5 +1,5 @@
 ---
-name: github
+name: github-wiki
 description: Manage GitHub Wiki and GitHub Projects for the current repo. Knows the authentication quirks for each (SSH for Wiki push, OAuth scopes for Projects).
 argument-hint: "[wiki or projects] [action]"
 allowed-tools: "Bash(git:*),Bash(gh:*),Bash(ssh:*),Read,Write,Edit,Grep,Glob"
@@ -11,11 +11,11 @@ Assists with GitHub Wiki editing and GitHub Project board management for the cur
 
 ## Quick Commands
 
-- `/github wiki list` — Clone the wiki and list all pages
-- `/github wiki edit <page>` — Edit a specific wiki page
-- `/github wiki create <page>` — Create a new wiki page
-- `/github projects list` — List GitHub Projects for this repo
-- `/github projects view <number>` — View a specific project board
+- `/github-wiki wiki list` — Clone the wiki and list all pages
+- `/github-wiki wiki edit <page>` — Edit a specific wiki page
+- `/github-wiki wiki create <page>` — Create a new wiki page
+- `/github-wiki projects list` — List GitHub Projects for this repo
+- `/github-wiki projects view <number>` — View a specific project board
 
 ## Authentication Reference
 

@@ -27,7 +27,7 @@ Project-agnostic: it ships with generic defaults and a small set of env-var knob
 - **assess** — grep/glob coverage scorecard; ranks the files where missing docs cost the most.
 - **annotate** — applies the house style (`references/comment-style.md`); comments/formatting only, behavior-preserving (lint/type-check/test must stay green).
 - **generate** — *hybrid*: deterministic tool layer (`scripts/extract-docs.mjs` + TypeDoc) for props tables/signatures, plus a model-written prose layer (overviews, real-call-site examples, cross-links, AI-context callouts). Both read the same TSDoc, so they can't drift.
-- **publish** — SSH push to `<repo>.wiki.git` (reuses the `/github wiki` flow); never overwrites hand-authored pages (HTML-marker check).
+- **publish** — SSH push to `<repo>.wiki.git` (reuses the `/github-wiki wiki` flow); never overwrites hand-authored pages (HTML-marker check).
 - **team** — maintains the two *human* pages (Getting-Started + Skill-Inventory): hand-authored prose with `<!--cr:…-->` fact-blocks (prereqs, env, scripts, stack) stamped from the repo by `scripts/gen-team-pages.mjs`. `team scaffold` creates them; `team stamp` refreshes the facts. See `SKILL.md` → Phase 5.
 
 ## Configure

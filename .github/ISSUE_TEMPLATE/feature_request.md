@@ -7,7 +7,7 @@ labels: enhancement
 
 ## Problem
 
-What are you trying to do that the steward doesn't support today? Describe the situation, not a
+What are you trying to do that the butler doesn't support today? Describe the situation, not a
 pre-chosen solution — the underlying need is what matters.
 
 ## Proposed solution

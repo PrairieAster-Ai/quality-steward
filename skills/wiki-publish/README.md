@@ -30,6 +30,6 @@ Both doc producers were reimplementing the same two things:
 - **`/code-health`** — `stamp-codehealth.mjs` delegates to `stamp.mjs` (prefix `ch`),
   falling back to inline stamping if `wiki-publish` isn't installed.
 - **`/code-readability`** — team-page (`cr:`) stamping + the publish flow.
-- **`quality-steward`** — composes it in the "document" step.
+- **`quality-butler`** — composes it in the "document" step.
 
 See `SKILL.md` for the publish protocol and the marker convention.

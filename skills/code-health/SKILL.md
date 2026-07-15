@@ -4,7 +4,7 @@ description: >-
   Structural code-health metrics, the rolled-up CodeHealth score, and the Code
   Health Dashboard pipeline (Maintainability Index, cyclomatic/cognitive
   complexity, churn×complexity hotspots, coupling/instability, change-coupling,
-  duplication, circular imports). Measures + trends + renders; the quality-steward
+  duplication, circular imports). Measures + trends + renders; the quality-butler
   composes it. Use to instrument a repo, take a reading, or refresh the dashboard.
 ---
 
@@ -28,7 +28,7 @@ One dashboard, several producers — each skill owns its dimension:
 
 This skill **measures and aggregates**; it does not annotate docs, write tests, or
 run the full security toolchain — it reads those signals (doc%, npm-audit counts,
-coverage) where they live and rolls them into the score. The `quality-steward`
+coverage) where they live and rolls them into the score. The `quality-butler`
 agent is the orchestrator that runs all four and publishes the dashboard.
 
 ## Configure for your project
@@ -66,7 +66,7 @@ toolchain / `npx`.
 - **`refresh`** — regenerate the dashboard: `run-all.mjs --stamp <wiki>/Code-Health-Dashboard.md <wiki>/Home.md` fills the `<!--ch:*-->` markers.
 
 Suggested `package.json` aliases. Point them at wherever the skill is installed —
-`.claude/skills/code-health/scripts/…` when it's vendored into the project (the quality-steward
+`.claude/skills/code-health/scripts/…` when it's vendored into the project (the quality-butler
 model, shown below), or `~/.claude/skills/code-health/scripts/…` for a global install:
 
 ```jsonc
@@ -117,9 +117,9 @@ readings) plus `ch:doc_pct` / `ch:security` for the CodeHealth roll-up's
 documentation and dependency-security dimensions. The full marker set lives in
 `references/methodology.md`.
 
-## Quality-coverage checklist (steward feature)
+## Quality-coverage checklist (butler feature)
 
-`quality-checklist.mjs` is a steward-level tracker that ships here (it reuses this
+`quality-checklist.mjs` is a butler-level tracker that ships here (it reuses this
 skill's config + the `/wiki-publish` stamper). It probes the repo — CI workflows,
 ESLint config, `package.json`, pre-commit, the code-health history, installed
 skills, and (with `--wiki`) published pages — for **every** capability the quality
@@ -132,17 +132,17 @@ node <skill>/scripts/quality-checklist.mjs --wiki <wiki> --stamp <wiki>/Quality-
 ```
 
 Writes `<historyDir>/quality-checklist.json` and stamps the `<!--ql:*-->` markers on
-the **Quality-Coverage** dashboard. The steward runs it in its weekly document step.
+the **Quality-Coverage** dashboard. The butler runs it in its weekly document step.
 
 ## Trend it (optional)
 
-Schedule the steward (or a `maintainability.yml` workflow) weekly to accumulate the
+Schedule the butler (or a `maintainability.yml` workflow) weekly to accumulate the
 `*-history.tsv` rows and re-stamp the dashboard, turning a one-time reading into
 an early-warning trend.
 
 **Where the trend lives:** the `<historyDir>/*-history.tsv` + stamp JSON are
 **generated artifacts — gitignore them on the default branch.** The durable trend
-belongs on the steward's `steward-state` branch (the quality-steward workflow
+belongs on the butler's `butler-state` branch (the quality-butler workflow
 restores it before a run and persists it after), so it survives ephemeral CI
 runners without the agent ever pushing to the default branch. Committing the trend
 to the default branch instead leaves a snapshot that silently goes stale.

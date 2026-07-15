@@ -8,7 +8,7 @@ __pycache__/
 *.py[cod]
 .venv/
 
-# Code-health generated artifacts (the durable trend lives on the steward-state
+# Code-health generated artifacts (the durable trend lives on the butler-state
 # branch, never the default branch — see skills/code-health/SKILL.md)
 code-health/*.tsv
 code-health/*.json

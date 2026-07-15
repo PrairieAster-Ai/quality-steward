@@ -1,0 +1,14 @@
+{
+  "name": "prairieaster-quality-butler",
+  "owner": { "name": "PrairieAster AI", "url": "https://github.com/PrairieAster-Ai" },
+  "description": "PrairieAster's quality-butler — an autonomous code-quality and documentation agent, as an installable Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "quality-butler",
+      "source": "./",
+      "description": "Autonomous code-quality + docs agent: a transparent CodeHealth score, safe auto-fixes via PR, escalation of non-trivial findings, and living documentation.",
+      "category": "engineering",
+      "keywords": ["code-quality", "code-health", "security-audit", "documentation", "ci"]
+    }
+  ]
+}

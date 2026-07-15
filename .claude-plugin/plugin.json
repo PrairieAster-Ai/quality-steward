@@ -1,0 +1,22 @@
+{
+  "name": "quality-butler",
+  "displayName": "Quality Butler",
+  "version": "0.3.0",
+  "description": "An autonomous code-quality + documentation agent for Claude Code. Monitors a transparent CodeHealth score, auto-fixes safe mechanical issues via PRs, escalates the non-trivial ones for review, and keeps living docs current. Bundles code-health, code-readability, security-audit, code-quality, github-wiki, and wiki-publish skills.",
+  "author": { "name": "Robert H. Speer", "email": "rhspeer@gmail.com" },
+  "homepage": "https://github.com/PrairieAster-Ai/quality-butler",
+  "repository": "https://github.com/PrairieAster-Ai/quality-butler",
+  "license": "Apache-2.0",
+  "keywords": ["code-quality", "code-health", "metrics", "security-audit", "documentation", "maintainability", "ci"],
+  "skills": [
+    "./skills/code-health",
+    "./skills/code-readability",
+    "./skills/security-audit",
+    "./skills/code-quality",
+    "./skills/github-wiki",
+    "./skills/wiki-publish"
+  ],
+  "agents": [
+    "./agents/quality-butler.md"
+  ]
+}

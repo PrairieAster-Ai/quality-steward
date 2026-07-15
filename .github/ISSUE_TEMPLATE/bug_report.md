@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Something the steward or a skill did wrong
+about: Something the butler or a skill did wrong
 title: "fix: "
 labels: bug
 ---
@@ -22,7 +22,7 @@ A clear description of the bug.
 
 ## Expected behavior
 
-What you expected the steward / skill to do.
+What you expected the butler / skill to do.
 
 ## Actual behavior
 
@@ -40,7 +40,7 @@ What it actually did. Include the relevant output.
 
 <!--
 Paste the relevant GitHub Actions job log (or local agent output). Redact secrets and
-any private source. The steward's final report line (detected mode · deltas · PR/issue links)
+any private source. The butler's final report line (detected mode · deltas · PR/issue links)
 is especially useful.
 -->
 

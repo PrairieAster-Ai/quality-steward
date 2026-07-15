@@ -20,7 +20,7 @@ const run = (c, opts = {}) => execSync(c, { encoding: 'utf8', stdio: ['ignore', 
 
 function wikiUrl(repo) {
   // git@github.com:Owner/Repo(.git) or https://github.com/Owner/Repo → SSH wiki URL
-  const m = repo.match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/);
+  const m = repo.match(/github-wiki\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/);
   if (!m) throw new Error(`can't derive wiki URL from: ${repo}`);
   return `git@github.com:${m[1]}/${m[2]}.wiki.git`;
 }
