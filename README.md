@@ -2,7 +2,7 @@
 
 **Turn code quality from an invisible liability into a metric you can govern by.**
 
-quality-butler is an autonomous [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+quality-butler is an autonomous Claude Code
 agent that watches your codebase's health, fixes the safe things itself, escalates the non-trivial
 ones with evidence, and keeps your documentation current — on every pull request and every week,
 without anyone having to remember to do it.
